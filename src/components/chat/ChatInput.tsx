@@ -33,18 +33,18 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
 
     return (
         <div className="border-t border-white/10 bg-zen-dark/80 backdrop-blur-md">
-            <div className="max-w-4xl mx-auto p-4">
-                <div className="flex items-end gap-3">
+            <div className="max-w-3xl mx-auto p-3">
+                <div className="flex items-end gap-2">
                     {/* Add button */}
                     <button
-                        className="p-3 rounded-full glass hover:bg-white/10 transition-colors flex-shrink-0"
+                        className="p-2.5 rounded-full glass hover:bg-white/10 transition-colors flex-shrink-0"
                         disabled={disabled}
                     >
-                        <Plus size={24} className="text-zen-primary" />
+                        <Plus size={20} className="text-zen-primary" />
                     </button>
 
                     {/* Input area */}
-                    <div className="flex-1 glass rounded-3xl flex items-end overflow-hidden">
+                    <div className="flex-1 glass rounded-2xl flex items-end overflow-hidden">
                         <textarea
                             ref={textareaRef}
                             value={message}
@@ -53,15 +53,15 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
                             placeholder="Type here..."
                             disabled={disabled}
                             rows={1}
-                            className="flex-1 bg-transparent px-5 py-3.5 text-white placeholder-gray-500 resize-none focus:outline-none max-h-32 min-h-[48px]"
+                            className="flex-1 bg-transparent px-4 py-2.5 text-white text-sm placeholder-gray-500 resize-none focus:outline-none max-h-28 min-h-[42px]"
                         />
 
                         {/* Mic button */}
                         <button
-                            className="p-3 hover:bg-white/5 transition-colors flex-shrink-0"
+                            className="p-2.5 hover:bg-white/5 transition-colors flex-shrink-0"
                             disabled={disabled}
                         >
-                            <Mic size={20} className="text-zen-primary" />
+                            <Mic size={18} className="text-zen-primary" />
                         </button>
                     </div>
 
@@ -69,9 +69,9 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
                     <button
                         onClick={handleSend}
                         disabled={!message.trim() || disabled}
-                        className="p-4 bg-gradient-primary rounded-full hover:opacity-90 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+                        className="p-3 bg-gradient-primary rounded-full hover:opacity-90 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
                     >
-                        <Send size={20} className="text-white" />
+                        <Send size={18} className="text-white" />
                     </button>
                 </div>
             </div>

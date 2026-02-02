@@ -17,12 +17,12 @@ export const ChatBubble = ({ message }: ChatBubbleProps) => {
     const isUser = message.role === 'user';
 
     return (
-        <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 animate-slide-up`}>
+        <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3 animate-slide-up`}>
             <div className={isUser ? 'chat-bubble-user' : 'chat-bubble-ai'}>
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
 
                 {message.emotion_state && isUser && (
-                    <div className="flex items-center gap-2 mt-2 text-xs opacity-70">
+                    <div className="flex items-center gap-1.5 mt-1.5 text-xs opacity-70">
                         <span>{getEmotionEmoji(message.emotion_state)}</span>
                         <span>{message.emotion_state}</span>
                         {message.energy_level && (
@@ -32,7 +32,7 @@ export const ChatBubble = ({ message }: ChatBubbleProps) => {
                 )}
 
                 {message.model_used && !isUser && (
-                    <div className="text-xs opacity-50 mt-2">
+                    <div className="text-xs opacity-50 mt-1.5">
                         {message.response_time_ms && `${(message.response_time_ms / 1000).toFixed(1)}s`}
                     </div>
                 )}

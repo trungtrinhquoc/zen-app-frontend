@@ -23,10 +23,10 @@ export const OnboardingPage = () => {
             </div>
 
             {/* Content */}
-            <div className="relative z-10 max-w-md w-full space-y-12 animate-fade-in">
+            <div className="relative z-10 max-w-sm w-full space-y-8 animate-fade-in">
                 {/* Title */}
                 <div className="text-center">
-                    <h1 className="text-3xl font-semibold text-white leading-relaxed">
+                    <h1 className="text-2xl font-semibold text-white leading-relaxed">
                         A calm space, just for you
                     </h1>
                 </div>
@@ -38,14 +38,14 @@ export const OnboardingPage = () => {
                         <div className="absolute inset-0 bg-gradient-primary opacity-20 blur-3xl rounded-full" />
 
                         {/* Main illustration */}
-                        <div className="relative w-64 h-64 bg-gradient-primary/10 rounded-full flex items-center justify-center backdrop-blur-sm border-2 border-zen-primary/20">
-                            <div className="text-9xl">🧘‍♀️</div>
+                        <div className="relative w-48 h-48 bg-gradient-primary/10 rounded-full flex items-center justify-center backdrop-blur-sm border-2 border-zen-primary/20">
+                            <div className="text-7xl">🧘‍♀️</div>
                         </div>
                     </div>
                 </div>
 
                 {/* Features */}
-                <div className="space-y-5">
+                <div className="space-y-3">
                     <FeatureItem icon="💬" text="Talk to an AI companion" />
                     <FeatureItem icon="🌸" text="Practice gentle routines" />
                     <FeatureItem icon="🎵" text="Listen to calming sounds" />
@@ -61,10 +61,10 @@ export const OnboardingPage = () => {
 };
 
 const FeatureItem = ({ icon, text }: { icon: string; text: string }) => (
-    <div className="flex items-center gap-4">
-        <div className="w-6 h-6 flex items-center justify-center">
-            <span className="text-2xl">{icon}</span>
+    <div className="flex items-center gap-3">
+        <div className="w-5 h-5 flex items-center justify-center">
+            <span className="text-xl">{icon}</span>
         </div>
-        <span className="text-white/90 text-lg">{text}</span>
+        <span className="text-white/90 text-base">{text}</span>
     </div>
 );

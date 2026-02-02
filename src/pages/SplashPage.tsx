@@ -31,11 +31,11 @@ export const SplashPage = () => {
             </div>
 
             {/* Logo */}
-            <div className="relative z-10 text-center space-y-6 animate-fade-in">
-                <div className="w-40 h-40 mx-auto bg-gradient-primary/20 rounded-[32px] flex items-center justify-center border-4 border-zen-primary/30 backdrop-blur-sm">
-                    <div className="text-8xl">🌙</div>
+            <div className="relative z-10 text-center space-y-4 animate-fade-in">
+                <div className="w-28 h-28 mx-auto bg-gradient-primary/20 rounded-3xl flex items-center justify-center border-2 border-zen-primary/30 backdrop-blur-sm">
+                    <div className="text-6xl">🌙</div>
                 </div>
-                <h1 className="text-6xl font-bold text-white tracking-[0.2em]">Zen</h1>
+                <h1 className="text-4xl font-bold text-white tracking-[0.2em]">Zen</h1>
             </div>
         </div>
     );

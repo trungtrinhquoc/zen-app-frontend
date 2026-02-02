@@ -37,25 +37,25 @@
 
   /* Chat bubbles */
   .chat-bubble-user {
-    @apply bg-gradient-primary text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-[80%];
+    @apply bg-gradient-primary text-white rounded-2xl rounded-tr-sm px-3.5 py-2.5 max-w-[75%];
   }
 
   .chat-bubble-ai {
-    @apply bg-zen-purple/60 backdrop-blur-md text-white rounded-2xl rounded-tl-sm px-4 py-3 max-w-[80%];
+    @apply bg-zen-purple/60 backdrop-blur-md text-white rounded-2xl rounded-tl-sm px-3.5 py-2.5 max-w-[75%];
   }
 
   /* Button styles */
   .btn-primary {
-    @apply bg-gradient-primary text-white font-semibold px-6 py-3 rounded-full hover:opacity-90 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-gradient-primary text-white font-semibold px-5 py-2.5 rounded-full hover:opacity-90 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply glass text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 active:scale-95 transition-all duration-200;
+    @apply glass text-white font-semibold px-5 py-2.5 rounded-full hover:bg-white/10 active:scale-95 transition-all duration-200;
   }
 
   /* Input styles */
   .input-primary {
-    @apply glass px-4 py-3 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-zen-primary transition-all duration-200;
+    @apply glass px-3.5 py-2.5 rounded-2xl text-white text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-zen-primary transition-all duration-200;
   }
 }
 
