@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-zen-dark text-white font-sans antialiased;
+  }
+
+  #root {
+    min-height: 100vh;
+    width: 100%;
+  }
+}
+
+@layer components {
+
+  /* Glassmorphism effect */
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-zen {
+    background: linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 100%);
+  }
+
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+  }
+
+  /* Chat bubbles */
+  .chat-bubble-user {
+    @apply bg-gradient-primary text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-[80%];
+  }
+
+  .chat-bubble-ai {
+    @apply bg-zen-purple/60 backdrop-blur-md text-white rounded-2xl rounded-tl-sm px-4 py-3 max-w-[80%];
+  }
+
+  /* Button styles */
+  .btn-primary {
+    @apply bg-gradient-primary text-white font-semibold px-6 py-3 rounded-full hover:opacity-90 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply glass text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 active:scale-95 transition-all duration-200;
+  }
+
+  /* Input styles */
+  .input-primary {
+    @apply glass px-4 py-3 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-zen-primary transition-all duration-200;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.5);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.7);
+}
+
+/* Animations */
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
