@@ -49,76 +49,102 @@ export const ChatPage = () => {
             id: `optimistic-${Date.now()}`,
             role: 'user',
             content: messageText,
-            content_type: 'text',
-            sequence_number: messages.length + 1,
-            created_at: new Date().toISOString(),
+            contentType: 'text',
+            sequenceNumber: messages.length + 1,
+            createdAt: new Date().toISOString(),
         };
 
         // ✅ HIỂN THỊ NGAY LẬP TỨC
         addMessage(optimisticUserMessage);
 
+        // ✅ TẠO STREAMING ASSISTANT MESSAGE (bắt đầu rỗng)
+        const streamingMessage: Message = {
+            id: `streaming-${Date.now()}`,
+            role: 'assistant',
+            content: '', // ← Bắt đầu rỗng, sẽ thêm chunks vào
+            contentType: 'text',
+            sequenceNumber: messages.length + 2,
+            createdAt: new Date().toISOString(),
+        };
+
+        addMessage(streamingMessage);
         setSending(true);
 
         try {
-            const startTime = performance.now(); // ⏱️ Start timer
+            const startTime = performance.now();
+            console.log('🚀 Sending message with streaming...');
 
-            console.log('🚀 Sending message to backend...');
+            // ✅ CALL STREAMING API
+            await chatAPI.sendMessage(
+                {
+                    userId: '25f1e353-566d-4ef2-8927-32c9fddada42',
+                    message: messageText,
+                    conversationId: currentConversation?.id,
+                    includeContext: true,
+                },
+                // onChunk: Nhận từng chữ và cập nhật UI ngay lập tức
+                (chunk: string) => {
+                    const currentMessages = useChatStore.getState().messages;
+                    const updated = currentMessages.map(msg =>
+                        msg.id === streamingMessage.id
+                            ? { ...msg, content: msg.content + chunk } // ← Thêm chunk vào
+                            : msg
+                    );
+                    useChatStore.setState({ messages: updated });
+                },
+                // onMetadata: Nhận emotion + conversationId khi hoàn thành
+                (metadata) => {
+                    console.log('📊 Metadata received:', metadata);
 
-            const response = await chatAPI.sendMessage({
-                message: messageText,
-                conversation_id: currentConversation?.id,
-                include_context: true,
-            });
+                    if (!currentConversation) {
+                        setCurrentConversation({
+                            id: metadata.conversationId,
+                            userId: '25f1e353-566d-4ef2-8927-32c9fddada42',
+                            title: 'New Chat',
+                            status: 'active',
+                            messageCount: 2,
+                            startedAt: new Date().toISOString(),
+                            createdAt: new Date().toISOString(),
+                        });
+                    }
 
-            const endTime = performance.now(); // ⏱️ End timer
-            const totalTime = ((endTime - startTime) / 1000).toFixed(2);
+                    const endTime = performance.now();
+                    const totalTime = ((endTime - startTime) / 1000).toFixed(2);
+                    console.log(`⏱️ Total streaming time: ${totalTime}s`);
+                    console.log(`🎭 Emotion: ${metadata.userMessage.emotionState}, Energy: ${metadata.userMessage.energyLevel}`);
+                    console.log(`📊 Context: ${metadata.contextUsed} messages`);
+                    console.log(`🤖 Model: ${metadata.assistantMessage.modelUsed || 'N/A'}`);
+                    if (metadata.assistantMessage.promptTokens) {
+                        console.log(`🎫 Tokens: ${metadata.assistantMessage.completionTokens} completion + ${metadata.assistantMessage.promptTokens} prompt`);
+                    }
+                },
+                // onError: Xử lý lỗi
+                (error: string) => {
+                    console.error('❌ Streaming error:', error);
 
-            // ✅ LOG TIMING
-            console.log(`⏱️ Total API time: ${totalTime}s`);
-            console.log(`📊 Breakdown:
-        - Emotion analysis: ~${response.user_message.response_time_ms || 0}ms
-        - AI response: ~${response.assistant_message.response_time_ms || 0}ms
-        - Total: ${totalTime}s
-      `);
+                    // Remove streaming message nếu lỗi
+                    const currentMessages = useChatStore.getState().messages;
+                    const filtered = currentMessages.filter(m => m.id !== streamingMessage.id);
+                    useChatStore.setState({ messages: filtered });
 
-            if (!currentConversation) {
-                setCurrentConversation({
-                    id: response.conversation_id,
-                    user_id: '25f1e353-566d-4ef2-8927-32c9fddada42',
-                    title: 'New Chat',
-                    status: 'active',
-                    message_count: 2,
-                    started_at: new Date().toISOString(),
-                    created_at: new Date().toISOString(),
-                });
-            }
-
-            // ✅ REPLACE optimistic message với real message
-            const currentMessages = useChatStore.getState().messages;
-            const updatedMessages = currentMessages.map(msg =>
-                msg.id === optimisticUserMessage.id ? response.user_message : msg
+                    alert(`Streaming error: ${error}`);
+                }
             );
 
-            // Update store với real messages
-            useChatStore.setState({
-                messages: [...updatedMessages, response.assistant_message]
-            });
-
-            if (response.suggestion) {
-                setSuggestion(response.suggestion);
-            }
         } catch (error: any) {
             console.error('❌ Send error:', error);
 
-            // ✅ REMOVE optimistic message nếu lỗi
+            // ✅ REMOVE cả 2 optimistic messages nếu lỗi
             const currentMessages = useChatStore.getState().messages;
-            const filteredMessages = currentMessages.filter(m => m.id !== optimisticUserMessage.id);
+            const filteredMessages = currentMessages.filter(
+                m => m.id !== optimisticUserMessage.id && m.id !== streamingMessage.id
+            );
             useChatStore.setState({ messages: filteredMessages });
 
             if (!isOnline) {
                 alert('Backend is offline. Please start backend server:\nuvicorn app.main:app --reload --host 0.0.0.0 --port 8000');
             } else {
-                alert(error.response?.data?.detail || 'Failed to send message');
+                alert(error.message || 'Failed to send message');
             }
         } finally {
             setSending(false);
@@ -197,7 +223,7 @@ export const ChatPage = () => {
                             <div className="text-center space-y-3">
                                 <div className="text-4xl">💡</div>
                                 <h3 className="text-xl font-semibold text-white">
-                                    {currentSuggestion.activity_name}
+                                    {currentSuggestion.activityName}
                                 </h3>
                                 <p className="text-gray-300 text-sm">{currentSuggestion.reason}</p>
                                 <p className="text-gray-400 text-xs">{currentSuggestion.description}</p>

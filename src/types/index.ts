@@ -1,56 +1,57 @@
 export interface User {
     id: string;
-    display_name?: string;
-    avatar_url?: string;
+    displayName?: string;
+    avatarUrl?: string;
     language: string;
-    created_at: string;
+    createdAt: string;
 }
 
 export interface Message {
     id: string;
     role: 'user' | 'assistant' | 'system';
     content: string;
-    content_type: string;
-    sequence_number: number;
-    created_at: string;
-    emotion_state?: string;
-    energy_level?: number;
-    urgency_level?: string;
-    detected_themes?: string[];
-    model_used?: string;
-    prompt_tokens?: number;
-    completion_tokens?: number;
-    response_time_ms?: number;
+    contentType: string;
+    sequenceNumber: number;
+    createdAt: string;
+    emotionState?: string;
+    energyLevel?: number;
+    urgencyLevel?: string;
+    detectedThemes?: string[];
+    modelUsed?: string;
+    promptTokens?: number;
+    completionTokens?: number;
+    responseTimeMs?: number;
 }
 
 export interface Conversation {
     id: string;
-    user_id: string;
+    userId: string;
     title?: string;
     status: string;
-    message_count: number;
-    dominant_emotion?: string;
-    started_at: string;
-    created_at: string;
+    messageCount: number;
+    dominantEmotion?: string;
+    startedAt: string;
+    createdAt: string;
 }
 
 export interface ChatRequest {
+    userId: string;  // Required now!
     message: string;
-    conversation_id?: string;
-    include_context?: boolean;
+    conversationId?: string;
+    includeContext?: boolean;
 }
 
 export interface ChatResponse {
-    conversation_id: string;
-    user_message: Message;
-    assistant_message: Message;
-    context_used: number;
+    conversationId: string;
+    userMessage: Message;
+    assistantMessage: Message;
+    contextUsed: number;
     suggestion?: ActivitySuggestion;
 }
 
 export interface ActivitySuggestion {
-    activity_type: string;
-    activity_name: string;
+    activityType: string;
+    activityName: string;
     duration: number;
     reason: string;
     description: string;

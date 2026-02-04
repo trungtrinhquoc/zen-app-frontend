@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { ChatRequest, ChatResponse, Conversation } from '../types';
+import type { ChatRequest, Conversation } from '../types';
 
 // ✅ LOCALHOST - Không cần IP phức tạp
 const API_BASE_URL = 'http://localhost:8000/api/v1';
@@ -42,9 +42,110 @@ api.interceptors.response.use(
 );
 
 export const chatAPI = {
-    sendMessage: async (request: ChatRequest): Promise<ChatResponse> => {
-        const response = await api.post('/chat/chat', request);
-        return response.data;
+    /**
+     * Send message with streaming response (real-time text display like ChatGPT)
+     * Uses Server-Sent Events (SSE) to receive chunks as they're generated
+     */
+    sendMessage: async (
+        request: ChatRequest,
+        onChunk: (chunk: string) => void,
+        onMetadata?: (metadata: {
+            conversationId: string;
+            userMessage: {
+                role: string;
+                content: string;
+                emotionState: string;
+                energyLevel: number;
+                urgencyLevel: string;
+                detectedThemes: string[];
+                sequenceNumber: number;
+            };
+            assistantMessage: {
+                role: string;
+                content: string;
+                modelUsed?: string;
+                promptTokens?: number;
+                completionTokens?: number;
+                responseTimeMs?: number;
+                sequenceNumber: number;
+            };
+            contextUsed: number;
+            method: string;
+        }) => void,
+        onError?: (error: string) => void
+    ): Promise<void> => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/chat/stream`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(request),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const reader = response.body?.getReader();
+            if (!reader) {
+                throw new Error('No response body');
+            }
+
+            const decoder = new TextDecoder();
+            let buffer = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+
+                // Keep last incomplete line in buffer
+                buffer = lines.pop() || '';
+
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+
+                    if (line.startsWith('event: chunk')) {
+                        const dataLine = lines[i + 1]?.trim();
+                        if (dataLine?.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(dataLine.substring(6));
+                                onChunk(data.content);
+                            } catch (e) {
+                                console.error('Failed to parse chunk:', e);
+                            }
+                        }
+                    } else if (line.startsWith('event: metadata')) {
+                        const dataLine = lines[i + 1]?.trim();
+                        if (dataLine?.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(dataLine.substring(6));
+                                onMetadata?.(data);
+                            } catch (e) {
+                                console.error('Failed to parse metadata:', e);
+                            }
+                        }
+                    } else if (line.startsWith('event: error')) {
+                        const dataLine = lines[i + 1]?.trim();
+                        if (dataLine?.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(dataLine.substring(6));
+                                onError?.(data.error);
+                            } catch (e) {
+                                console.error('Failed to parse error:', e);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (error: any) {
+            console.error('❌ Streaming error:', error);
+            onError?.(error.message || 'Streaming failed');
+            throw error;
+        }
     },
 
     getConversations: async (limit = 20, offset = 0): Promise<Conversation[]> => {
