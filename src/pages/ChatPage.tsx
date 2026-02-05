@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MessageList } from '../components/chat/MessageList';
 import { ChatInput } from '../components/chat/ChatInput';
 import { useChatStore } from '../store/chatStore';
@@ -20,9 +20,11 @@ export const ChatPage = () => {
 
     const [isOnline, setIsOnline] = useState(true);
     const [showSuggestion, setShowSuggestion] = useState(false);
+    const hasCheckedGreeting = useRef(false);
 
     useEffect(() => {
         checkHealth();
+        checkGreeting();
     }, []);
 
     useEffect(() => {
@@ -38,6 +40,40 @@ export const ChatPage = () => {
         } catch (error) {
             setIsOnline(false);
             console.error('Backend offline:', error);
+        }
+    };
+
+    const checkGreeting = async () => {
+        // Prevent double call in StrictMode
+        if (hasCheckedGreeting.current) return;
+
+        // Only get greeting if chat is empty
+        if (useChatStore.getState().messages.length === 0) {
+            hasCheckedGreeting.current = true;
+            try {
+                // Hardcoded userId for now found in codebase
+                const userId = '25f1e353-566d-4ef2-8927-32c9fddada42';
+                const response = await chatAPI.getGreeting(userId, currentConversation?.id);
+
+                if (response.assistantMessage) {
+                    addMessage(response.assistantMessage);
+
+                    // Update conversation if needed
+                    if (!currentConversation && response.conversationId) {
+                        setCurrentConversation({
+                            id: response.conversationId,
+                            userId,
+                            title: 'New Chat',
+                            status: 'active',
+                            messageCount: 1,
+                            startedAt: new Date().toISOString(),
+                            createdAt: new Date().toISOString(),
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to get greeting:', error);
+            }
         }
     };
 

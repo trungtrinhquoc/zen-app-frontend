@@ -37,9 +37,39 @@ export const MessageList = ({ messages, isLoading }: MessageListProps) => {
     return (
         <div className="h-full overflow-y-auto">
             <div className="max-w-3xl mx-auto px-4 py-4 space-y-3">
-                {messages.map((message) => (
-                    <ChatBubble key={message.id} message={message} />
-                ))}
+                {messages.flatMap((message) => {
+                    // Only split assistant messages
+                    if (message.role === 'assistant' && message.content) {
+                        const parts = message.content.split(/\n\n+/).filter(p => p.trim());
+
+                        // If no split (or empty), return original
+                        if (parts.length <= 1) {
+                            return [<ChatBubble key={message.id} message={message} />];
+                        }
+
+                        // Return multiple bubbles
+                        return parts.map((part, index) => {
+                            const isLast = index === parts.length - 1;
+                            const splitMessage = {
+                                ...message,
+                                content: part,
+                                // Only show metadata (e.g. response time) on last bubble
+                                model_used: isLast ? message.model_used : undefined,
+                                response_time_ms: isLast ? message.response_time_ms : undefined
+                            };
+
+                            return (
+                                <ChatBubble
+                                    key={`${message.id}-${index}`}
+                                    message={splitMessage}
+                                />
+                            );
+                        });
+                    }
+
+                    // User messages render normally
+                    return [<ChatBubble key={message.id} message={message} />];
+                })}
 
                 {isLoading && (
                     <div className="flex justify-start">

@@ -148,6 +148,16 @@ export const chatAPI = {
         }
     },
 
+    getGreeting: async (userId: string, conversationId?: string) => {
+        const response = await api.post('/chat/greeting', {
+            userId,
+            conversationId,
+            message: 'greeting', // Required by schema
+            includeContext: false
+        });
+        return response.data;
+    },
+
     getConversations: async (limit = 20, offset = 0): Promise<Conversation[]> => {
         const response = await api.get('/chat/conversations', {
             params: { limit, offset },
