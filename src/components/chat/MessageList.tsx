@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { Message } from '../../types';
 import { ChatBubble } from './ChatBubble';
+import { SuggestionCard } from './SuggestionCard';
 
 interface MessageListProps {
     messages: Message[];
@@ -44,11 +45,20 @@ export const MessageList = ({ messages, isLoading }: MessageListProps) => {
 
                         // If no split (or empty), return original
                         if (parts.length <= 1) {
-                            return [<ChatBubble key={message.id} message={message} />];
+                            return [
+                                <ChatBubble key={message.id} message={message} />,
+                                // Render suggestion card if exists
+                                message.suggestion && (
+                                    <SuggestionCard
+                                        key={`${message.id}-suggestion`}
+                                        suggestion={message.suggestion}
+                                    />
+                                )
+                            ].filter(Boolean);
                         }
 
-                        // Return multiple bubbles
-                        return parts.map((part, index) => {
+                        // Return multiple bubbles + suggestion at the end
+                        const bubbles = parts.map((part, index) => {
                             const isLast = index === parts.length - 1;
                             const splitMessage = {
                                 ...message,
@@ -65,6 +75,18 @@ export const MessageList = ({ messages, isLoading }: MessageListProps) => {
                                 />
                             );
                         });
+
+                        // Add suggestion card after last bubble
+                        if (message.suggestion) {
+                            bubbles.push(
+                                <SuggestionCard
+                                    key={`${message.id}-suggestion`}
+                                    suggestion={message.suggestion}
+                                />
+                            );
+                        }
+
+                        return bubbles;
                     }
 
                     // User messages render normally

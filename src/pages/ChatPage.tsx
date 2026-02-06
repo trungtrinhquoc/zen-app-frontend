@@ -15,7 +15,6 @@ export const ChatPage = () => {
         addMessage,
         setSending,
         setCurrentConversation,
-        setSuggestion,
     } = useChatStore();
 
     const [isOnline, setIsOnline] = useState(true);
@@ -144,6 +143,18 @@ export const ChatPage = () => {
                         });
                     }
 
+                    // Attach suggestion to assistant message if exists
+                    if (metadata.suggestion) {
+                        const currentMessages = useChatStore.getState().messages;
+                        const updated = currentMessages.map(msg =>
+                            msg.id === streamingMessage.id
+                                ? { ...msg, suggestion: metadata.suggestion }
+                                : msg
+                        );
+                        useChatStore.setState({ messages: updated });
+                        console.log('💡 Suggestion attached:', metadata.suggestion.card_title);
+                    }
+
                     const endTime = performance.now();
                     const totalTime = ((endTime - startTime) / 1000).toFixed(2);
                     console.log(`⏱️ Total streaming time: ${totalTime}s`);
@@ -257,12 +268,11 @@ export const ChatPage = () => {
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="text-center space-y-3">
-                                <div className="text-4xl">💡</div>
+                                <div className="text-4xl">{currentSuggestion.icon || '💡'}</div>
                                 <h3 className="text-xl font-semibold text-white">
-                                    {currentSuggestion.activityName}
+                                    {currentSuggestion.card_title}
                                 </h3>
-                                <p className="text-gray-300 text-sm">{currentSuggestion.reason}</p>
-                                <p className="text-gray-400 text-xs">{currentSuggestion.description}</p>
+                                <p className="text-gray-300 text-sm">{currentSuggestion.description}</p>
                                 <div className="inline-block bg-zen-primary/20 px-3 py-1.5 rounded-full">
                                     <span className="text-zen-primary font-medium text-sm">
                                         {currentSuggestion.duration} minutes

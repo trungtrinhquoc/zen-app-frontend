@@ -21,6 +21,7 @@ export interface Message {
     promptTokens?: number;
     completionTokens?: number;
     responseTimeMs?: number;
+    suggestion?: ActivitySuggestion;  // NEW: For suggestion cards
 }
 
 export interface Conversation {
@@ -50,9 +51,14 @@ export interface ChatResponse {
 }
 
 export interface ActivitySuggestion {
-    activityType: string;
-    activityName: string;
-    duration: number;
-    reason: string;
+    activity_type: string;
+    name: string;
+    card_title: string;
     description: string;
+    duration: number;
+    icon: string;
+    visual_style: string;
+    action_text: string;
+    route_path: string;
 }
+

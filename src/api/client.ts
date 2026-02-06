@@ -71,6 +71,7 @@ export const chatAPI = {
             };
             contextUsed: number;
             method: string;
+            suggestion?: any;  // NEW: For suggestion cards
         }) => void,
         onError?: (error: string) => void
     ): Promise<void> => {
