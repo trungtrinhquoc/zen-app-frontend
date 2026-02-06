@@ -54,8 +54,8 @@ export const MessageList = ({ messages, isLoading }: MessageListProps) => {
                                 ...message,
                                 content: part,
                                 // Only show metadata (e.g. response time) on last bubble
-                                model_used: isLast ? message.model_used : undefined,
-                                response_time_ms: isLast ? message.response_time_ms : undefined
+                                modelUsed: isLast ? message.modelUsed : undefined,
+                                responseTimeMs: isLast ? message.responseTimeMs : undefined
                             };
 
                             return (

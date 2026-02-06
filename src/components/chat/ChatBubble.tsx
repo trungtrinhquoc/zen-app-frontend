@@ -21,19 +21,19 @@ export const ChatBubble = ({ message }: ChatBubbleProps) => {
             <div className={isUser ? 'chat-bubble-user' : 'chat-bubble-ai'}>
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
 
-                {message.emotion_state && isUser && (
+                {message.emotionState && isUser && (
                     <div className="flex items-center gap-1.5 mt-1.5 text-xs opacity-70">
-                        <span>{getEmotionEmoji(message.emotion_state)}</span>
-                        <span>{message.emotion_state}</span>
-                        {message.energy_level && (
-                            <span>• Energy: {message.energy_level}/10</span>
+                        <span>{getEmotionEmoji(message.emotionState)}</span>
+                        <span>{message.emotionState}</span>
+                        {message.energyLevel && (
+                            <span>• Energy: {message.energyLevel}/10</span>
                         )}
                     </div>
                 )}
 
-                {message.model_used && !isUser && (
+                {message.modelUsed && !isUser && (
                     <div className="text-xs opacity-50 mt-1.5">
-                        {message.response_time_ms && `${(message.response_time_ms / 1000).toFixed(1)}s`}
+                        {message.responseTimeMs && `${(message.responseTimeMs / 1000).toFixed(1)}s`}
                     </div>
                 )}
             </div>
