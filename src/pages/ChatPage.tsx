@@ -1,36 +1,35 @@
 import { useState, useEffect, useRef } from 'react';
 import { MessageList } from '../components/chat/MessageList';
 import { ChatInput } from '../components/chat/ChatInput';
+import { Sidebar } from '../components/chat/Sidebar';
 import { useChatStore } from '../store/chatStore';
 import { chatAPI, healthAPI } from '../api/client';
+import { historyAPI } from '../api/history';
 import { Settings, AlertCircle } from 'lucide-react';
 import type { Message } from '../types';
+
 
 export const ChatPage = () => {
     const {
         messages,
         currentConversation,
         isSending,
-        currentSuggestion,
         addMessage,
+        setMessages,
         setSending,
         setCurrentConversation,
+        clearMessages,
     } = useChatStore();
 
     const [isOnline, setIsOnline] = useState(true);
-    const [showSuggestion, setShowSuggestion] = useState(false);
     const hasCheckedGreeting = useRef(false);
+    const userId = '25f1e353-566d-4ef2-8927-32c9fddada42'; // Hardcoded for now
+
 
     useEffect(() => {
         checkHealth();
         checkGreeting();
     }, []);
-
-    useEffect(() => {
-        if (currentSuggestion) {
-            setShowSuggestion(true);
-        }
-    }, [currentSuggestion]);
 
     const checkHealth = async () => {
         try {
@@ -198,8 +197,57 @@ export const ChatPage = () => {
         }
     };
 
+    const handleNewChat = () => {
+        clearMessages();
+        setCurrentConversation(null);
+        hasCheckedGreeting.current = false;
+        checkGreeting();
+    };
+
+    const handleSelectConversation = async (conversationId: string) => {
+        if (isSending) return;
+
+        try {
+            setSending(true);
+            const detail = await historyAPI.fetchConversationDetail(conversationId, userId);
+
+            // Map backend messages to store format
+            setMessages(detail.messages.map(m => ({
+                id: m.id,
+                role: m.role,
+                content: m.content,
+                contentType: m.contentType || 'text',
+                sequenceNumber: m.sequenceNumber,
+                createdAt: m.createdAt,
+                emotionState: m.emotionState,
+                energyLevel: m.energyLevel,
+                urgencyLevel: m.urgencyLevel,
+                detectedThemes: m.detectedThemes
+            })));
+
+            setCurrentConversation({
+                id: detail.id,
+                userId: detail.userId,
+                title: detail.title,
+                status: detail.status,
+                messageCount: detail.messageCount,
+                startedAt: detail.startedAt,
+                createdAt: detail.createdAt,
+                dominantEmotion: detail.dominantEmotion
+            });
+
+            // Mark greeting as checked since we're loading history
+            hasCheckedGreeting.current = true;
+        } catch (error) {
+            console.error('Failed to load conversation:', error);
+            alert('Không thể tải cuộc hội thoại này.');
+        } finally {
+            setSending(false);
+        }
+    };
+
     return (
-        <div className="h-screen bg-gradient-zen flex flex-col relative overflow-hidden">
+        <div className="h-screen bg-gradient-zen flex relative overflow-hidden">
             {/* Stars background */}
             <div className="absolute inset-0">
                 {[...Array(40)].map((_, i) => (
@@ -215,8 +263,16 @@ export const ChatPage = () => {
                 ))}
             </div>
 
-            {/* Content */}
-            <div className="relative z-10 flex flex-col h-full">
+            {/* Sidebar */}
+            <Sidebar
+                userId={userId}
+                currentConversationId={currentConversation?.id}
+                onNewChat={handleNewChat}
+                onSelectConversation={handleSelectConversation}
+            />
+
+            {/* Main Chat Area */}
+            <div className="flex-1 flex flex-col relative z-10">
                 {/* Header */}
                 <div className="border-b border-white/10 bg-zen-dark/80 backdrop-blur-md">
                     <div className="max-w-3xl mx-auto px-4 py-2.5 flex items-center justify-between">
@@ -233,73 +289,56 @@ export const ChatPage = () => {
                             </div>
                         </div>
 
-                        <button className="p-2 rounded-full glass hover:bg-white/10 transition-colors">
-                            <Settings size={18} className="text-white" />
-                        </button>
-                    </div>
-                </div>
-
-                {/* Offline Warning */}
-                {!isOnline && (
-                    <div className="bg-red-500/10 border-b border-red-500/20 px-4 py-2 backdrop-blur-sm">
-                        <div className="max-w-3xl mx-auto flex items-center gap-2 text-red-400 text-xs">
-                            <AlertCircle size={14} />
-                            <span>Backend offline. Start: <code className="bg-black/30 px-1.5 py-0.5 rounded text-xs">uvicorn app.main:app --reload</code></span>
-                            <button onClick={checkHealth} className="ml-auto text-red-300 hover:text-red-200 underline text-xs">
-                                Retry
+                        <div className="flex items-center gap-2">
+                            {/* Settings Button */}
+                            <button
+                                className="p-2 rounded-full glass hover:bg-white/10 transition-colors"
+                                title="Cài đặt"
+                            >
+                                <Settings size={18} className="text-white" />
                             </button>
                         </div>
                     </div>
-                )}
-
-                {/* Messages */}
-                <div className="flex-1 overflow-hidden">
-                    <MessageList messages={messages} isLoading={isSending} />
                 </div>
 
-                {/* Suggestion Modal */}
-                {showSuggestion && currentSuggestion && (
-                    <div
-                        className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-                        onClick={() => setShowSuggestion(false)}
-                    >
-                        <div
-                            className="glass rounded-2xl p-6 max-w-sm w-full space-y-4 animate-slide-up"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="text-center space-y-3">
-                                <div className="text-4xl">{currentSuggestion.icon || '💡'}</div>
-                                <h3 className="text-xl font-semibold text-white">
-                                    {currentSuggestion.card_title}
-                                </h3>
-                                <p className="text-gray-300 text-sm">{currentSuggestion.description}</p>
-                                <div className="inline-block bg-zen-primary/20 px-3 py-1.5 rounded-full">
-                                    <span className="text-zen-primary font-medium text-sm">
-                                        {currentSuggestion.duration} minutes
-                                    </span>
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto">
+                    <div className="max-w-3xl mx-auto px-4 py-6">
+                        {!isOnline && (
+                            <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg flex items-center gap-2 text-red-200">
+                                <AlertCircle size={18} />
+                                <span className="text-sm">Backend offline. Please check your connection.</span>
+                            </div>
+                        )}
+
+                        <MessageList messages={messages} />
+
+                        {isSending && (
+                            <div className="flex justify-start mt-4">
+                                <div className="bg-zen-purple/60 backdrop-blur-md text-white rounded-2xl rounded-tl-sm px-3.5 py-2.5 max-w-[75%]">
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex gap-1">
+                                            <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse" />
+                                            <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
+                                            <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
+                                        </div>
+                                        <span className="text-xs text-white/70">Đang suy nghĩ...</span>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => setShowSuggestion(false)}
-                                    className="flex-1 btn-secondary text-sm"
-                                >
-                                    Maybe later
-                                </button>
-                                <button
-                                    onClick={() => setShowSuggestion(false)}
-                                    className="flex-1 btn-primary text-sm"
-                                >
-                                    Got it
-                                </button>
-                            </div>
-                        </div>
+                        )}
                     </div>
-                )}
+                </div>
 
                 {/* Input */}
-                <ChatInput onSend={handleSend} disabled={isSending || !isOnline} />
+                <div className="border-t border-white/10 bg-zen-dark/80 backdrop-blur-md">
+                    <div className="max-w-3xl mx-auto px-4 py-3">
+                        <ChatInput
+                            onSend={handleSend}
+                            disabled={isSending || !isOnline}
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     );

@@ -11,6 +11,7 @@ interface ChatState {
     setCurrentConversation: (conversation: Conversation | null) => void;
     setMessages: (messages: Message[]) => void;
     addMessage: (message: Message) => void;
+    clearMessages: () => void;
     setLoading: (loading: boolean) => void;
     setSending: (sending: boolean) => void;
     setSuggestion: (suggestion: ActivitySuggestion | null) => void;
@@ -31,6 +32,8 @@ export const useChatStore = create<ChatState>((set) => ({
 
     addMessage: (message) =>
         set((state) => ({ messages: [...state.messages, message] })),
+
+    clearMessages: () => set({ messages: [] }),
 
     setLoading: (loading) => set({ isLoading: loading }),
 
