@@ -40,6 +40,9 @@ export interface ChatRequest {
     message: string;
     conversationId?: string;
     includeContext?: boolean;
+    // Voice metadata
+    isVoiceInput?: boolean;
+    voiceDuration?: number;
 }
 
 export interface ChatResponse {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MessageList } from '../components/chat/MessageList';
 import { ChatInput } from '../components/chat/ChatInput';
+import { VoiceRecorder } from '../components/VoiceRecorder';
 import { Sidebar } from '../components/chat/Sidebar';
 import { useChatStore } from '../store/chatStore';
 import { chatAPI, healthAPI } from '../api/client';
@@ -75,7 +76,7 @@ export const ChatPage = () => {
         }
     };
 
-    const handleSend = async (messageText: string) => {
+    const handleSend = async (messageText: string, voiceMetadata?: { isVoiceInput: boolean; voiceDuration: number }) => {
         if (!messageText.trim() || isSending) return;
 
         // ✅ TẠO OPTIMISTIC USER MESSAGE
@@ -115,6 +116,9 @@ export const ChatPage = () => {
                     message: messageText,
                     conversationId: currentConversation?.id,
                     includeContext: true,
+                    // Voice metadata
+                    isVoiceInput: voiceMetadata?.isVoiceInput || false,
+                    voiceDuration: voiceMetadata?.voiceDuration,
                 },
                 // onChunk: Nhận từng chữ và cập nhật UI ngay lập tức
                 (chunk: string) => {
@@ -195,6 +199,14 @@ export const ChatPage = () => {
         } finally {
             setSending(false);
         }
+    };
+
+    const handleVoiceTranscript = (text: string, duration: number) => {
+        // Auto-send voice message
+        handleSend(text, {
+            isVoiceInput: true,
+            voiceDuration: duration
+        });
     };
 
     const handleNewChat = () => {
@@ -333,10 +345,18 @@ export const ChatPage = () => {
                 {/* Input */}
                 <div className="border-t border-white/10 bg-zen-dark/80 backdrop-blur-md">
                     <div className="max-w-3xl mx-auto px-4 py-3">
-                        <ChatInput
-                            onSend={handleSend}
-                            disabled={isSending || !isOnline}
-                        />
+                        <div className="flex items-end gap-2">
+                            <VoiceRecorder
+                                onTranscript={handleVoiceTranscript}
+                                disabled={isSending || !isOnline}
+                            />
+                            <div className="flex-1">
+                                <ChatInput
+                                    onSend={handleSend}
+                                    disabled={isSending || !isOnline}
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
