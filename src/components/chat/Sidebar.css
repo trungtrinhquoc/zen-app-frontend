@@ -1,7 +1,7 @@
 .sidebar {
-    width: 280px;
+    width: 260px;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(20px);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
@@ -29,48 +29,77 @@
     background: rgba(255, 255, 255, 0.15);
 }
 
+/* ── Header row ── */
 .sidebar-header {
-    padding: 16px;
+    padding: 12px 10px 10px;
     display: flex;
+    align-items: center;
     gap: 8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.new-chat-btn {
+/* Tab group takes all remaining space */
+.sidebar-tabs {
     flex: 1;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 10px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
+    display: flex;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 4px;
+}
+
+/* Base tab button */
+.sidebar-tab-btn {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    transition: all 0.2s ease;
+    gap: 5px;
+    padding: 8px 6px;
+    border-radius: 7px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
 }
 
-.new-chat-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
+.sidebar-tab-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.85);
 }
 
+/* Accent variant (Lộ trình) */
+.sidebar-tab-btn--accent {
+    color: #9a75ea;
+}
+
+.sidebar-tab-btn--accent:hover {
+    background: rgba(154, 117, 234, 0.15);
+    color: #b09af5;
+}
+
+/* Close button stays small */
 .sidebar-close {
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.6);
-    padding: 8px;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 6px;
     cursor: pointer;
     transition: color 0.2s ease;
+    border-radius: 6px;
+    flex-shrink: 0;
 }
 
 .sidebar-close:hover {
+    background: rgba(255, 255, 255, 0.08);
     color: white;
 }
 
+/* ── Content ── */
 .sidebar-content {
     flex: 1;
     overflow-y: auto;
@@ -110,20 +139,21 @@
 
 .sidebar-empty p {
     margin-top: 12px;
-    font-size: 14px;
+    font-size: 13px;
 }
 
+/* ── Conversation list ── */
 .conversation-list-sidebar {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
 }
 
 .conversation-item {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid transparent;
     border-radius: 8px;
-    padding: 12px;
+    padding: 10px 12px;
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -134,12 +164,12 @@
 
 .conversation-item:hover {
     background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.08);
 }
 
 .conversation-item.active {
-    background: rgba(139, 92, 246, 0.2);
-    border-color: rgba(139, 92, 246, 0.4);
+    background: rgba(139, 92, 246, 0.18);
+    border-color: rgba(139, 92, 246, 0.35);
 }
 
 .conversation-item-content {
@@ -150,11 +180,11 @@
 .conversation-item-title {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     color: white;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 .conversation-item-title span {
@@ -167,8 +197,8 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.45);
 }
 
 .conversation-item-date {
@@ -182,12 +212,13 @@
 .conversation-item-delete {
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.4);
-    padding: 6px;
+    color: rgba(255, 255, 255, 0.3);
+    padding: 5px;
     cursor: pointer;
     border-radius: 4px;
     transition: all 0.2s ease;
     opacity: 0;
+    flex-shrink: 0;
 }
 
 .conversation-item:hover .conversation-item-delete {
@@ -195,13 +226,13 @@
 }
 
 .conversation-item-delete:hover {
-    background: rgba(255, 107, 107, 0.2);
+    background: rgba(255, 107, 107, 0.18);
     color: #ff6b6b;
 }
 
 /* Scrollbar */
 .sidebar-content::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
 }
 
 .sidebar-content::-webkit-scrollbar-track {
@@ -209,15 +240,15 @@
 }
 
 .sidebar-content::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
     border-radius: 3px;
 }
 
 .sidebar-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.25);
 }
 
-/* Mobile responsive */
+/* Mobile */
 @media (max-width: 768px) {
     .sidebar {
         position: fixed;

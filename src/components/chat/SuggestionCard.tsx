@@ -11,6 +11,8 @@ const gradientStyles: Record<string, string> = {
     'gradient-purple-pink': 'bg-gradient-to-br from-purple-400 via-pink-400 to-pink-500',
     'gradient-dark-blue': 'bg-gradient-to-br from-indigo-600 via-blue-700 to-blue-800',
     'gradient-soft-blue': 'bg-gradient-to-br from-blue-300 via-cyan-300 to-teal-300',
+    // Legacy / catch-all
+    'gradient-warm-orange': 'bg-gradient-to-br from-purple-500 via-purple-600 to-blue-500',
 };
 
 export const SuggestionCard = ({ suggestion }: SuggestionCardProps) => {

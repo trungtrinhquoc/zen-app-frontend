@@ -346,10 +346,12 @@ export const ChatPage = () => {
                 <div className="border-t border-white/10 bg-zen-dark/80 backdrop-blur-md">
                     <div className="max-w-3xl mx-auto px-4 py-3">
                         <div className="flex items-end gap-2">
+                            {/* Real voice mic (replaces the old duplicate) */}
                             <VoiceRecorder
                                 onTranscript={handleVoiceTranscript}
                                 disabled={isSending || !isOnline}
                             />
+                            {/* Text input row (no extra wrappers) */}
                             <div className="flex-1">
                                 <ChatInput
                                     onSend={handleSend}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { historyAPI, type Conversation } from '../../api/history';
-import { Menu, X, Plus, MessageSquare, Trash2 } from 'lucide-react';
+import { Menu, X, MessageSquare, Trash2, Sparkles, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -16,6 +17,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onNewChat,
     onSelectConversation,
 }) => {
+    const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(true);
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [loading, setLoading] = useState(false);
@@ -69,13 +71,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     return (
         <div className="sidebar">
+            {/* ── Header: Tab row ── */}
             <div className="sidebar-header">
-                <button className="new-chat-btn" onClick={onNewChat}>
-                    <Plus size={18} />
-                    <span>Chat mới</span>
-                </button>
-                <button className="sidebar-close" onClick={() => setIsOpen(false)}>
-                    <X size={20} />
+                <div className="sidebar-tabs">
+                    {/* Tab 1: Chat mới */}
+                    <button className="sidebar-tab-btn" onClick={onNewChat}>
+                        <Plus size={15} />
+                        <span>Chat mới</span>
+                    </button>
+
+                    {/* Tab 2: Lộ trình */}
+                    <button
+                        className="sidebar-tab-btn sidebar-tab-btn--accent"
+                        onClick={() => navigate('/activity/routine')}
+                    >
+                        <Sparkles size={15} />
+                        <span>Lộ trình</span>
+                    </button>
+                </div>
+
+                {/* Close */}
+                <button className="sidebar-close" onClick={() => setIsOpen(false)} title="Đóng">
+                    <X size={18} />
                 </button>
             </div>
 
